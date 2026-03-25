@@ -831,7 +831,7 @@ select option { background:var(--panel); }
         <button class="btn-teacher" onclick="openPinModal()" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
           🔐 Teacher: View Results
         </button>
-        <button class="btn-secondary" onclick="resetQuiz()" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
+        <button id="newAttemptBtn" class="btn-secondary" onclick="resetQuiz()" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
           ↺ New Attempt
         </button>
       </div>
@@ -949,19 +949,26 @@ let superPower = false;
 try { results = JSON.parse(localStorage.getItem('csq_results') || '[]'); } catch(e) { results = []; }
 
 // ===== ATTEMPT TRACKING =====
-function getAttemptRecord(email) {
-  try { const r = localStorage.getItem('csq_att_' + email); return r ? JSON.parse(r) : {attempts:[]}; }
-  catch(e) { return {attempts:[]}; }
+// Key: csq_done_{email} → JSON array of completed attempt timestamps
+// An attempt is only counted once endQuiz() fires (completion, not start).
+function _attKey(email) { return 'csq_done_' + email.trim().toLowerCase(); }
+
+function getCompletedAttempts(email) {
+  try { const r = localStorage.getItem(_attKey(email)); return r ? JSON.parse(r) : []; }
+  catch(e) { return []; }
 }
-function saveAttemptRecord(email, rec) {
-  try { localStorage.setItem('csq_att_' + email, JSON.stringify(rec)); } catch(e) {}
+function saveCompletedAttempts(email, arr) {
+  try { localStorage.setItem(_attKey(email), JSON.stringify(arr)); } catch(e) {}
 }
+
 function checkAttemptAllowed(email) {
-  const rec = getAttemptRecord(email);
-  const now = Date.now();
-  if (rec.attempts.length === 0) return { allowed:true, attemptNum:1 };
-  if (rec.attempts.length === 1) {
-    const elapsed = now - rec.attempts[0].ts;
+  const done = getCompletedAttempts(email);
+  const now  = Date.now();
+
+  if (done.length === 0) return { allowed:true, attemptNum:1 };
+
+  if (done.length === 1) {
+    const elapsed = now - done[0];
     if (elapsed < MS_PER_DAY) {
       const h = Math.ceil((MS_PER_DAY - elapsed) / 3600000);
       return { allowed:false, attemptNum:2,
@@ -969,13 +976,16 @@ function checkAttemptAllowed(email) {
     }
     return { allowed:true, attemptNum:2 };
   }
+
   return { allowed:false, attemptNum:0,
-    msg:'&#x1F512; You have completed both allowed attempts. Please speak to your teacher if you have any concerns.' };
+    msg:'&#x1F512; You have completed both allowed attempts for this assessment. Please speak to your teacher if you have any concerns.' };
 }
-function recordAttempt(email, attemptNum) {
-  const rec = getAttemptRecord(email);
-  rec.attempts.push({ ts: Date.now(), attemptNum });
-  saveAttemptRecord(email, rec);
+
+// Called only from endQuiz() — records a COMPLETED attempt
+function recordCompletedAttempt(email) {
+  const done = getCompletedAttempts(email);
+  done.push(Date.now());
+  saveCompletedAttempts(email, done);
 }
 
 // ===== THEME TOGGLES =====
@@ -1026,7 +1036,6 @@ function startQuiz() {
     [questions[i],questions[j]] = [questions[j],questions[i]];
   }
   questions = questions.slice(0, TOTAL_Q);
-  recordAttempt(em, check.attemptNum);
   showScreen('quiz');
   loadQuestion();
 }
@@ -1161,19 +1170,29 @@ function endQuiz() {
   else                { grade='F';  gradeClass='grade-F'; stars='☆☆☆☆☆'; }
 
   const result = { ...student, score, grade, xp, pct, timestamp: new Date().toLocaleString('en-GB') };
-  results = results.filter(r => !(r.email === student.email && r.class === student.class));
+  results = results.filter(r => !(r.email === student.email && r.class === student.class && r.attemptNum === student.attemptNum));
   results.push(result);
   try { localStorage.setItem('csq_results', JSON.stringify(results)); } catch(e) {}
 
+  // Record completed attempt ONLY here — prevents re-entry on refresh or back button
+  recordCompletedAttempt(student.email);
   document.getElementById('finalScore').textContent    = score;
   document.getElementById('gradeBadge').textContent    = `${grade} (${pct}%)`;
   document.getElementById('gradeBadge').className      = 'grade-badge ' + gradeClass;
   document.getElementById('starRating').textContent    = stars;
   document.getElementById('resultName').textContent    = `${student.firstName} ${student.lastName}`;
-  document.getElementById('resultsMeta').textContent   = `${student.class} · ${student.email}`;
+  document.getElementById('resultsMeta').textContent   = `${student.class} · ${student.email} · Attempt ${student.attemptNum} of 2`;
   document.getElementById('correctCount').textContent  = score;
   document.getElementById('wrongCount').textContent    = TOTAL_Q - score;
   document.getElementById('totalXP').textContent       = xp;
+
+  // Hide "New Attempt" button if both attempts now used
+  const newAttemptBtn = document.getElementById('newAttemptBtn');
+  if (student.attemptNum >= 2) {
+    newAttemptBtn.style.display = 'none';
+  } else {
+    newAttemptBtn.style.display = '';
+  }
 
   showScreen('results');
 }
