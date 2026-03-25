@@ -654,6 +654,94 @@ select option { background:var(--panel); }
 }
 .btn-export:hover { background:var(--green); color:white; }
 
+
+/* COLOUR SCREEN FILTER */
+.colour-filter-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:9999;
+  mix-blend-mode:multiply;
+  transition:background 0.4s;
+}
+.colour-filter-overlay.active { display:block; }
+.colour-filter-overlay.blue   { background:rgba(180,210,255,0.28); }
+.colour-filter-overlay.green  { background:rgba(180,255,200,0.28); }
+
+/* LEVEL 2 UNLOCK BANNER */
+.level2-unlock {
+  background:linear-gradient(135deg,#1a9e5c,#0d7a44);
+  border-radius:14px;
+  padding:24px 28px;
+  text-align:center;
+  color:white;
+  margin-bottom:18px;
+  box-shadow:0 4px 20px rgba(26,158,92,0.35);
+  animation:fadeIn 0.5s ease;
+}
+.level2-unlock h2 {
+  font-family:'Orbitron',monospace;
+  font-size:1.2rem;
+  letter-spacing:0.1em;
+  margin-bottom:10px;
+}
+.level2-unlock p { font-size:0.95rem; font-weight:600; opacity:0.92; margin-bottom:18px; line-height:1.6; }
+
+.level2-locked {
+  background:var(--panel2);
+  border:2px dashed var(--border);
+  border-radius:14px;
+  padding:22px 24px;
+  text-align:center;
+  color:var(--text-dim);
+  margin-bottom:18px;
+}
+.level2-locked p { font-size:0.9rem; font-weight:600; line-height:1.6; }
+
+/* CODE BLOCK inside questions */
+.code-block {
+  background:#1e1e2e;
+  color:#cdd6f4;
+  border-radius:8px;
+  padding:14px 18px;
+  margin:14px 0 4px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.88rem;
+  line-height:1.7;
+  white-space:pre;
+  overflow-x:auto;
+  border-left:3px solid #89b4fa;
+  text-align:left;
+}
+.kw  { color:#cba6f7; }  /* keywords */
+.fn  { color:#89b4fa; }  /* function names */
+.str { color:#a6e3a1; }  /* strings */
+.num { color:#fab387; }  /* numbers */
+.cm  { color:#6c7086; font-style:italic; }  /* comments */
+
+/* L2 HUD colour */
+.hud-value.l2 { color:var(--green); }
+
+/* Teacher tabs */
+.teacher-tabs { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+.teacher-tab {
+  font-family:'Orbitron',monospace;
+  font-size:0.68rem;
+  font-weight:700;
+  letter-spacing:0.1em;
+  padding:9px 18px;
+  border-radius:6px;
+  cursor:pointer;
+  border:2px solid var(--border);
+  background:transparent;
+  color:var(--text-dim);
+  transition:all 0.3s;
+  text-transform:uppercase;
+}
+.teacher-tab.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; border-color:transparent; }
+.teacher-tab:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
+
 @media (max-width:600px) {
   .form-grid { grid-template-columns:1fr; }
   .intro-features { grid-template-columns:1fr; }
@@ -680,6 +768,7 @@ select option { background:var(--panel); }
 </div>
 
 <div class="score-popup" id="scorePopup">+10 XP</div>
+<div class="colour-filter-overlay" id="colourFilter"></div>
 
 <div class="container">
 
@@ -687,6 +776,8 @@ select option { background:var(--panel); }
   <div class="toolbar">
     <button class="tool-btn sp-btn" id="spBtn" onclick="toggleSuperpower()">⚡ Superpower Mode</button>
     <button class="tool-btn" id="darkBtn" onclick="toggleDark()">🌙 Dark Mode</button>
+    <button class="tool-btn" id="blueFilterBtn" onclick="setFilter('blue')" style="border-color:#5b9bd5;color:#1a4fa0">🔵 Blue Filter</button>
+    <button class="tool-btn" id="greenFilterBtn" onclick="setFilter('green')" style="border-color:#3a9e6a;color:#1a6040">🟢 Green Filter</button>
   </div>
 
   <!-- HEADER -->
@@ -827,9 +918,10 @@ select option { background:var(--panel); }
 
       <div class="completion-msg">
         🎉 Great work! Your result has been recorded.<br>
-        <strong>Your teacher can view the full class results and feedback.</strong><br>
-        You may close this window or start a new attempt below.
+        <strong>Your teacher can view the full class results and feedback.</strong>
       </div>
+
+      <div id="level2Section" style="margin-bottom:16px"></div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn-teacher" onclick="openPinModal()" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
@@ -842,11 +934,94 @@ select option { background:var(--panel); }
     </div>
   </div>
 
+
+  <!-- LEVEL 2 PYTHON QUIZ -->
+  <div class="screen" id="screen-level2">
+    <div class="xp-section">
+      <div class="xp-label" style="color:var(--green)">L2 XP</div>
+      <div class="xp-bar-track"><div class="xp-bar-fill" id="l2xpBar" style="width:0%;background:linear-gradient(90deg,#1a9e5c,#0d7a44)"></div></div>
+      <div class="xp-count" id="l2xpCount" style="color:var(--green)">0 XP</div>
+    </div>
+    <div class="hud">
+      <div class="hud-stat">
+        <div class="hud-label">Question</div>
+        <div class="hud-value l2" id="l2qNum">1/15</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-label" id="l2progressLabel">0% complete</div>
+        <div class="progress-track"><div class="progress-fill" id="l2progressBar" style="width:0%;background:linear-gradient(90deg,#1a9e5c,#0d7a44)"></div></div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Score</div>
+        <div class="hud-value l2" id="l2scoreDisplay">0</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Time</div>
+        <div class="timer" id="l2timer">60</div>
+      </div>
+    </div>
+    <div class="question-card" style="border-color:#1a9e5c">
+      <div class="question-tag" style="color:#1a9e5c" id="l2questionTag">Python</div>
+      <div class="question-text" id="l2questionText">Loading...</div>
+      <div id="l2codeBlock"></div>
+    </div>
+    <div class="options" id="l2optionsContainer"></div>
+    <div class="nav-row">
+      <button class="btn-next" id="l2nextBtn" onclick="l2NextQuestion()" disabled style="background:linear-gradient(135deg,#1a9e5c,#0d7a44)">NEXT ▶</button>
+    </div>
+  </div>
+
+  <!-- LEVEL 2 RESULTS -->
+  <div class="screen" id="screen-level2results">
+    <div class="panel" style="border-color:#1a9e5c">
+      <div class="results-hero">
+        <div class="results-score-circle" style="border-color:#1a9e5c;box-shadow:0 0 28px rgba(26,158,92,0.3)">
+          <div class="results-score-num" id="l2finalScore" style="background:linear-gradient(135deg,#1a9e5c,#0d7a44);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0</div>
+          <div class="results-score-denom">/15</div>
+        </div>
+        <div class="grade-badge" id="l2gradeBadge">—</div>
+        <div class="stars" id="l2starRating">★★★☆☆</div>
+        <h2 style="font-family:'Orbitron',monospace;font-size:1.15rem;margin-bottom:5px" id="l2resultName"></h2>
+        <div class="results-meta" id="l2resultsMeta"></div>
+      </div>
+      <div class="results-stats">
+        <div class="stat-box">
+          <div class="stat-box-num color-green" id="l2correctCount">0</div>
+          <div class="stat-box-label">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num color-red" id="l2wrongCount">0</div>
+          <div class="stat-box-label">Incorrect</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num color-gold" id="l2totalXP">0</div>
+          <div class="stat-box-label">XP Earned</div>
+        </div>
+      </div>
+      <div class="completion-msg">
+        🐍 Python Level complete! Your result has been recorded.<br>
+        <strong>Your teacher can view both levels in the results panel.</strong>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-teacher" onclick="openPinModal()" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
+          🔐 Teacher: View Results
+        </button>
+        <button class="btn-secondary" onclick="showScreen('register')" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
+          🏠 Home
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TEACHER RESULTS -->
   <div class="screen" id="screen-classresults">
+    <div class="teacher-tabs">
+      <button class="teacher-tab active" id="tabL1" onclick="switchTeacherTab(1)">📋 Level 1 Results</button>
+      <button class="teacher-tab" id="tabL2" onclick="switchTeacherTab(2)">🐍 Level 2 Python</button>
+    </div>
     <div class="results-page-header">
       <div>
-        <div style="font-family:'Orbitron',monospace;font-size:0.95rem;color:var(--accent2);letter-spacing:0.12em">📋 Proof of Learning — Teacher View</div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.95rem;color:var(--accent2);letter-spacing:0.12em" id="teacherViewTitle">📋 Level 1 — Proof of Learning</div>
         <div style="font-size:0.78rem;color:var(--text-dim);font-weight:700;margin-top:4px">Sorted by Class → Last Name (A–Z)</div>
       </div>
       <div class="filter-row">
@@ -865,7 +1040,7 @@ select option { background:var(--panel); }
         <thead>
           <tr>
             <th>#</th><th>Last Name</th><th>First Name</th><th>Class</th>
-            <th>Email</th><th>Score</th><th>Grade</th><th>XP</th><th>Completed</th>
+            <th>Email</th><th>Score</th><th>Grade</th><th>XP</th><th>L2?</th><th>Completed</th>
           </tr>
         </thead>
         <tbody id="resultsBody"></tbody>
@@ -1190,6 +1365,9 @@ function endQuiz() {
   document.getElementById('wrongCount').textContent    = TOTAL_Q - score;
   document.getElementById('totalXP').textContent       = xp;
 
+  // Show Level 2 unlock or locked section
+  renderLevel2Section(pct);
+
   // Hide "New Attempt" button if both attempts now used
   const newAttemptBtn = document.getElementById('newAttemptBtn');
   if (student.attemptNum >= 2) {
@@ -1250,8 +1428,11 @@ function populateClassFilter() {
 function renderResultsTable() {
   const cf = document.getElementById('filterClass').value;
   const nf = document.getElementById('filterName').value.toLowerCase();
+  const isL2 = (typeof teacherLevel !== 'undefined' && teacherLevel === 2);
+  const pool = isL2 ? l2results : results;
+  const totalQs = isL2 ? L2_TOTAL : TOTAL_Q;
 
-  let filtered = results.filter(r => {
+  let filtered = pool.filter(r => {
     const mc = !cf || r.class === cf;
     const mn = !nf || r.firstName.toLowerCase().includes(nf) || r.lastName.toLowerCase().includes(nf);
     return mc && mn;
@@ -1270,11 +1451,17 @@ function renderResultsTable() {
   if (filtered.length === 0) {
     empty.style.display = 'block';
     thead.style.display = 'none';
+    empty.innerHTML = '<span class="icon">' + (isL2 ? '🐍' : '📭') + '</span>' +
+      (isL2 ? 'No Level 2 results yet. Students need 80%+ on Level 1 to unlock it.' : 'No results yet. Students must complete the assessment first.');
     return;
   }
 
   empty.style.display = 'none';
   thead.style.display = '';
+
+  // Build L2 lookup map for L1 view: email -> has L2
+  const l2Map = {};
+  l2results.forEach(r => { l2Map[r.email + r.class] = r.grade; });
 
   const gradeMap = {'A*':'grade-A','A':'grade-A','B':'grade-B','C':'grade-C','D':'grade-D','F':'grade-F'};
   let lastClass = null, rank = 0;
@@ -1284,11 +1471,14 @@ function renderResultsTable() {
       lastClass = r.class; rank = 0;
       const cr = document.createElement('tr');
       cr.className = 'class-header';
-      cr.innerHTML = `<td colspan="9">📁 CLASS ${escHtml(r.class)}</td>`;
+      cr.innerHTML = `<td colspan="10">📁 CLASS ${escHtml(r.class)}</td>`;
       tbody.appendChild(cr);
     }
     rank++;
     const bw = Math.round(r.pct * 0.65);
+    const l2badge = (!isL2 && l2Map[r.email+r.class])
+      ? `<span class="mini-badge grade-A" style="background:linear-gradient(135deg,#1a9e5c,#0d7a44)">${escHtml(l2Map[r.email+r.class])}</span>`
+      : (isL2 ? '' : '<span style="color:var(--text-dim);font-size:0.75rem">—</span>');
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="color:var(--text-dim);font-family:'Share Tech Mono',monospace">${rank}</td>
@@ -1298,10 +1488,11 @@ function renderResultsTable() {
       <td style="font-family:'Share Tech Mono',monospace;font-size:0.76rem;color:var(--text-dim)">${escHtml(r.email)}</td>
       <td><div class="score-bar-wrap">
         <div class="score-bar" style="width:${bw}px"></div>
-        <span class="score-text">${r.score}/${TOTAL_Q} (${r.pct}%)</span>
+        <span class="score-text">${r.score}/${totalQs} (${r.pct}%)</span>
       </div></td>
       <td><span class="mini-badge ${gradeMap[r.grade]||'grade-F'}">${escHtml(r.grade)}</span></td>
       <td style="font-family:'Orbitron',monospace;font-size:0.76rem;color:var(--gold)">${r.xp}</td>
+      ${isL2 ? '' : `<td>${l2badge}</td>`}
       <td style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim)">${escHtml(r.timestamp)}</td>
     `;
     tbody.appendChild(tr);
@@ -1309,20 +1500,31 @@ function renderResultsTable() {
 }
 
 function clearResults() {
-  if (!confirm('Clear ALL results? This cannot be undone.')) return;
-  results = [];
-  try { localStorage.removeItem('csq_results'); } catch(e) {}
+  const isL2 = (typeof teacherLevel !== 'undefined' && teacherLevel === 2);
+  const label = isL2 ? 'Level 2 Python' : 'Level 1';
+  if (!confirm(`Clear ALL ${label} results? This cannot be undone.`)) return;
+  if (isL2) {
+    l2results = [];
+    try { localStorage.removeItem('csq_l2results'); } catch(e) {}
+  } else {
+    results = [];
+    try { localStorage.removeItem('csq_results'); } catch(e) {}
+  }
   renderResultsTable();
 }
 
 function exportCSV() {
-  const rows = [['Last Name','First Name','Class','Email','Score','Percent','Grade','XP','Completed']];
-  [...results].sort((a,b) => a.class !== b.class ? a.class.localeCompare(b.class) : a.lastName.localeCompare(b.lastName))
-    .forEach(r => rows.push([r.lastName,r.firstName,r.class,r.email,r.score,r.pct+'%',r.grade,r.xp,r.timestamp]));
+  const isL2 = (typeof teacherLevel !== 'undefined' && teacherLevel === 2);
+  const pool = isL2 ? l2results : results;
+  const label = isL2 ? 'Level 2 Python' : 'Level 1';
+  const totalQs = isL2 ? L2_TOTAL : TOTAL_Q;
+  const rows = [['Level','Last Name','First Name','Class','Email','Score','Percent','Grade','XP','Completed']];
+  [...pool].sort((a,b) => a.class !== b.class ? a.class.localeCompare(b.class) : a.lastName.localeCompare(b.lastName))
+    .forEach(r => rows.push([label,r.lastName,r.firstName,r.class,r.email,r.score+'/'+totalQs,r.pct+'%',r.grade,r.xp,r.timestamp]));
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'cs_quest_results.csv';
+  a.download = isL2 ? 'cs_quest_level2.csv' : 'cs_quest_results.csv';
   a.click();
 }
 
@@ -1364,6 +1566,362 @@ function fireBurst() {
     document.body.appendChild(p);
     setTimeout(() => p.remove(), 1100);
   }
+}
+
+
+
+// ===== COLOUR FILTER =====
+let activeFilter = '';
+function setFilter(colour) {
+  const overlay = document.getElementById('colourFilter');
+  const blueBtn = document.getElementById('blueFilterBtn');
+  const greenBtn = document.getElementById('greenFilterBtn');
+  if (activeFilter === colour) {
+    // Toggle off
+    activeFilter = '';
+    overlay.className = 'colour-filter-overlay';
+    blueBtn.classList.remove('active');
+    greenBtn.classList.remove('active');
+  } else {
+    activeFilter = colour;
+    overlay.className = 'colour-filter-overlay active ' + colour;
+    blueBtn.classList.toggle('active', colour === 'blue');
+    greenBtn.classList.toggle('active', colour === 'green');
+  }
+}
+
+// ===== LEVEL 2 QUESTION BANK =====
+const L2_QUESTIONS = [
+  {
+    t:"Variables & Output",
+    q:"What will this code print?",
+    code:`<span class="kw">name</span> = <span class="str">"Alice"</span>
+<span class="kw">age</span> = <span class="num">14</span>
+<span class="fn">print</span>(<span class="str">"Hello"</span>, name, <span class="str">"you are"</span>, age)`,
+    o:["Hello Alice you are 14","Hello name you are age","Error","Hello, Alice, you are, 14"],
+    a:0
+  },
+  {
+    t:"Loops",
+    q:"How many times will 'Hello' be printed?",
+    code:`<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):
+    <span class="fn">print</span>(<span class="str">"Hello"</span>)`,
+    o:["4","5","6","1"],
+    a:1
+  },
+  {
+    t:"Loops",
+    q:"What will this while loop print?",
+    code:`x = <span class="num">1</span>
+<span class="kw">while</span> x &lt; <span class="num">4</span>:
+    <span class="fn">print</span>(x)
+    x = x + <span class="num">1</span>`,
+    o:["1 2 3 4","1 2 3","0 1 2 3","2 3 4"],
+    a:1
+  },
+  {
+    t:"Loops",
+    q:"What does range(2, 8, 2) produce?",
+    code:`<span class="kw">for</span> n <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, <span class="num">8</span>, <span class="num">2</span>):
+    <span class="fn">print</span>(n)`,
+    o:["2 4 6 8","2 4 6","1 3 5 7","2 3 4 5 6 7"],
+    a:1
+  },
+  {
+    t:"Functions",
+    q:"What will this function return when called as shown?",
+    code:`<span class="kw">def</span> <span class="fn">add</span>(a, b):
+    <span class="kw">return</span> a + b
+
+<span class="fn">print</span>(<span class="fn">add</span>(<span class="num">3</span>, <span class="num">7</span>))`,
+    o:["37","10","ab","Error"],
+    a:1
+  },
+  {
+    t:"Functions",
+    q:"What is printed by this code?",
+    code:`<span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="fn">print</span>(<span class="str">"Hi"</span>, name)
+
+<span class="fn">greet</span>(<span class="str">"Bob"</span>)
+<span class="fn">greet</span>(<span class="str">"Sue"</span>)`,
+    o:["Hi Bob Hi Sue","Hi name Hi name","greet Bob greet Sue","Error"],
+    a:0
+  },
+  {
+    t:"Functions",
+    q:"What value does this function return?",
+    code:`<span class="kw">def</span> <span class="fn">square</span>(n):
+    <span class="kw">return</span> n * n
+
+result = <span class="fn">square</span>(<span class="num">4</span>)
+<span class="fn">print</span>(result)`,
+    o:["8","16","4","44"],
+    a:1
+  },
+  {
+    t:"Subroutines",
+    q:"What is the output of this program?",
+    code:`<span class="kw">def</span> <span class="fn">double</span>(x):
+    <span class="kw">return</span> x * <span class="num">2</span>
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    y = <span class="fn">double</span>(<span class="num">5</span>)
+    <span class="fn">print</span>(y)
+
+<span class="fn">main</span>()`,
+    o:["5","10","2","25"],
+    a:1
+  },
+  {
+    t:"Variables & Output",
+    q:"What is the data type of the variable score?",
+    code:`score = <span class="num">42</span>
+<span class="fn">print</span>(<span class="fn">type</span>(score))`,
+    o:["<class 'str'>","<class 'float'>","<class 'int'>","<class 'bool'>"],
+    a:2
+  },
+  {
+    t:"Loops",
+    q:"Which keyword stops a loop immediately?",
+    code:`<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>):
+    <span class="kw">if</span> i == <span class="num">5</span>:
+        ??? <span class="cm"># stops here</span>
+    <span class="fn">print</span>(i)`,
+    o:["stop","exit","break","end"],
+    a:2
+  },
+  {
+    t:"Functions",
+    q:"What will be printed?",
+    code:`<span class="kw">def</span> <span class="fn">check</span>(n):
+    <span class="kw">if</span> n &gt; <span class="num">10</span>:
+        <span class="kw">return</span> <span class="str">"big"</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="str">"small"</span>
+
+<span class="fn">print</span>(<span class="fn">check</span>(<span class="num">7</span>))`,
+    o:["big","small","7","Error"],
+    a:1
+  },
+  {
+    t:"Subroutines",
+    q:"What does the keyword 'def' do in Python?",
+    code:`<span class="kw">def</span> <span class="fn">my_function</span>():
+    <span class="fn">print</span>(<span class="str">"Hello!"</span>)`,
+    o:["Defines a variable","Defines a loop","Defines a function/subroutine","Imports a module"],
+    a:2
+  },
+  {
+    t:"Loops",
+    q:"What will this list loop print?",
+    code:`fruits = [<span class="str">"apple"</span>, <span class="str">"banana"</span>, <span class="str">"cherry"</span>]
+<span class="kw">for</span> f <span class="kw">in</span> fruits:
+    <span class="fn">print</span>(f)`,
+    o:["apple banana cherry","[apple, banana, cherry]","fruits","apple"],
+    a:0
+  },
+  {
+    t:"Variables & Output",
+    q:"What is the result of this string operation?",
+    code:`word = <span class="str">"Hello"</span>
+<span class="fn">print</span>(word + <span class="str">" World"</span>)`,
+    o:["HelloWorld","Hello World","word World","Error"],
+    a:1
+  },
+  {
+    t:"Functions",
+    q:"What value is printed?",
+    code:`<span class="kw">def</span> <span class="fn">power</span>(base, exp):
+    <span class="kw">return</span> base ** exp
+
+<span class="fn">print</span>(<span class="fn">power</span>(<span class="num">2</span>, <span class="num">3</span>))`,
+    o:["5","6","8","23"],
+    a:2
+  },
+];
+
+// ===== LEVEL 2 STATE =====
+const L2_TOTAL = 15;
+const L2_PASS_PCT = 80; // % needed on L1 to unlock L2
+let l2questions = [];
+let l2currentQ  = 0;
+let l2score     = 0;
+let l2xp        = 0;
+let l2answered  = false;
+let l2timeLeft  = 60;
+let l2timer     = null;
+let l2results   = [];
+try { l2results = JSON.parse(localStorage.getItem('csq_l2results') || '[]'); } catch(e) { l2results = []; }
+
+// ===== SHOW L2 SECTION ON RESULTS SCREEN =====
+function renderLevel2Section(pct) {
+  const el = document.getElementById('level2Section');
+  if (!el) return;
+  if (pct >= L2_PASS_PCT) {
+    el.innerHTML = `
+      <div class="level2-unlock">
+        <h2>🐍 LEVEL 2 UNLOCKED!</h2>
+        <p>Excellent work scoring <strong>${pct}%</strong>! You've unlocked the Python Challenge.<br>
+        Test your coding knowledge with 15 questions featuring real Python code.</p>
+        <button onclick="startLevel2()" style="font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;letter-spacing:0.1em;padding:13px 32px;border:none;border-radius:10px;cursor:pointer;background:white;color:#1a9e5c;box-shadow:0 4px 14px rgba(0,0,0,0.2)">
+          ▶ START PYTHON CHALLENGE
+        </button>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="level2-locked">
+        <p>🔒 <strong>Level 2 Python Challenge</strong> is locked.<br>
+        Score <strong>80% or above</strong> on Level 1 to unlock it. You scored ${pct}%.</p>
+      </div>`;
+  }
+}
+
+// ===== START LEVEL 2 =====
+function startLevel2() {
+  l2currentQ = 0; l2score = 0; l2xp = 0; l2answered = false;
+  l2questions = [...L2_QUESTIONS];
+  for (let i = l2questions.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [l2questions[i],l2questions[j]] = [l2questions[j],l2questions[i]];
+  }
+  document.getElementById('l2scoreDisplay').textContent = '0';
+  document.getElementById('l2xpBar').style.width = '0%';
+  document.getElementById('l2xpCount').textContent = '0 XP';
+  showScreen('level2');
+  l2LoadQuestion();
+}
+
+function l2LoadQuestion() {
+  l2answered = false;
+  const q = l2questions[l2currentQ];
+  document.getElementById('l2qNum').textContent = `${l2currentQ+1}/${L2_TOTAL}`;
+  document.getElementById('l2questionTag').textContent = q.t;
+  document.getElementById('l2questionText').textContent = q.q;
+  // Code block
+  const cb = document.getElementById('l2codeBlock');
+  if (q.code) {
+    cb.innerHTML = `<div class="code-block">${q.code}</div>`;
+  } else {
+    cb.innerHTML = '';
+  }
+  const pct = Math.round((l2currentQ/L2_TOTAL)*100);
+  document.getElementById('l2progressBar').style.width = pct+'%';
+  document.getElementById('l2progressLabel').textContent = pct+'% complete';
+
+  const container = document.getElementById('l2optionsContainer');
+  container.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.o.forEach((opt,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${escHtml(opt)}</span>`;
+    btn.addEventListener('click', () => l2SelectAnswer(i, btn));
+    container.appendChild(btn);
+  });
+  const nb = document.getElementById('l2nextBtn');
+  nb.disabled = true;
+  nb.textContent = (l2currentQ === L2_TOTAL-1) ? 'FINISH ✓' : 'NEXT ▶';
+  l2StartTimer();
+}
+
+function l2StartTimer() {
+  clearInterval(l2timer);
+  l2timeLeft = 60;
+  l2UpdateTimer();
+  l2timer = setInterval(() => {
+    l2timeLeft--;
+    l2UpdateTimer();
+    if (l2timeLeft <= 0) { clearInterval(l2timer); l2AutoSkip(); }
+  }, 1000);
+}
+
+function l2UpdateTimer() {
+  const el = document.getElementById('l2timer');
+  el.textContent = l2timeLeft;
+  el.className = 'timer';
+  if (l2timeLeft <= 10) el.classList.add('danger');
+  else if (l2timeLeft <= 20) el.classList.add('warning');
+}
+
+function l2AutoSkip() {
+  if (l2answered) return;
+  l2answered = true;
+  const opts = document.querySelectorAll('#l2optionsContainer .option');
+  opts[l2questions[l2currentQ].a].classList.add('correct');
+  opts.forEach(o => o.classList.add('disabled'));
+  document.getElementById('l2nextBtn').disabled = false;
+}
+
+function l2SelectAnswer(index, btn) {
+  if (l2answered) return;
+  l2answered = true;
+  clearInterval(l2timer);
+  const q = l2questions[l2currentQ];
+  const opts = document.querySelectorAll('#l2optionsContainer .option');
+  opts.forEach(o => o.classList.add('disabled'));
+  if (index === q.a) {
+    btn.classList.add('correct');
+    l2score++;
+    l2xp += 10;
+    if (l2timeLeft > 40) l2xp += 5;
+    document.getElementById('l2scoreDisplay').textContent = l2score;
+    const maxXP = L2_TOTAL * 15;
+    document.getElementById('l2xpBar').style.width = Math.min(100,(l2xp/maxXP)*100)+'%';
+    document.getElementById('l2xpCount').textContent = l2xp+' XP';
+    showScorePopup('+10 XP');
+    fireBurst();
+  } else {
+    btn.classList.add('wrong');
+    opts[q.a].classList.add('correct');
+  }
+  document.getElementById('l2nextBtn').disabled = false;
+}
+
+function l2NextQuestion() {
+  l2currentQ++;
+  if (l2currentQ >= L2_TOTAL) { l2EndQuiz(); return; }
+  l2LoadQuestion();
+}
+
+function l2EndQuiz() {
+  clearInterval(l2timer);
+  const pct = Math.round((l2score/L2_TOTAL)*100);
+  let grade, gradeClass, stars;
+  if      (pct >= 90) { grade='A*'; gradeClass='grade-A'; stars='★★★★★'; }
+  else if (pct >= 75) { grade='A';  gradeClass='grade-A'; stars='★★★★☆'; }
+  else if (pct >= 60) { grade='B';  gradeClass='grade-B'; stars='★★★☆☆'; }
+  else if (pct >= 45) { grade='C';  gradeClass='grade-C'; stars='★★☆☆☆'; }
+  else if (pct >= 30) { grade='D';  gradeClass='grade-D'; stars='★☆☆☆☆'; }
+  else                { grade='F';  gradeClass='grade-F'; stars='☆☆☆☆☆'; }
+
+  const result = { ...student, score:l2score, grade, xp:l2xp, pct, level:2, timestamp:new Date().toLocaleString('en-GB') };
+  l2results = l2results.filter(r => !(r.email===student.email && r.class===student.class));
+  l2results.push(result);
+  try { localStorage.setItem('csq_l2results', JSON.stringify(l2results)); } catch(e) {}
+
+  document.getElementById('l2finalScore').textContent   = l2score;
+  document.getElementById('l2gradeBadge').textContent   = `${grade} (${pct}%)`;
+  document.getElementById('l2gradeBadge').className     = 'grade-badge '+gradeClass;
+  document.getElementById('l2starRating').textContent   = stars;
+  document.getElementById('l2resultName').textContent   = `${student.firstName} ${student.lastName}`;
+  document.getElementById('l2resultsMeta').textContent  = `${student.class} · Python Level 2`;
+  document.getElementById('l2correctCount').textContent = l2score;
+  document.getElementById('l2wrongCount').textContent   = L2_TOTAL-l2score;
+  document.getElementById('l2totalXP').textContent      = l2xp;
+  showScreen('level2results');
+}
+
+// ===== TEACHER LEVEL TABS =====
+let teacherLevel = 1;
+function switchTeacherTab(level) {
+  teacherLevel = level;
+  document.getElementById('tabL1').classList.toggle('active', level===1);
+  document.getElementById('tabL2').classList.toggle('active', level===2);
+  document.getElementById('teacherViewTitle').textContent = level===1
+    ? '📋 Level 1 — Proof of Learning'
+    : '🐍 Level 2 — Python Challenge';
+  renderResultsTable();
 }
 
 function escHtml(str) {
