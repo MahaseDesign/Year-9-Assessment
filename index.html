@@ -876,52 +876,61 @@ select option { background:var(--panel); }
 </div><!-- /container -->
 
 <script>
-// ===== QUESTIONS =====
+// ===== QUESTIONS (no databases, 42-question pool) =====
 const QUESTIONS = [
-  {t:"Binary & Data",  q:"What is the binary representation of the decimal number 25?",                   o:["10011","11001","11010","10110"],                                                                                                                                   a:1},
-  {t:"Binary & Data",  q:"How many bytes are in 1 kilobyte (using binary units)?",                        o:["100","512","1000","1024"],                                                                                                                                         a:3},
-  {t:"Binary & Data",  q:"What does ASCII stand for?",                                                    o:["American Standard Code for Information Interchange","Automated System for Computing Information Indexing","Advanced Standard Computer Interface Information","American Symbolic Code for Integrated Information"], a:0},
-  {t:"Binary & Data",  q:"Which number system uses base 16?",                                             o:["Binary","Octal","Hexadecimal","Denary"],                                                                                                                          a:2},
-  {t:"Binary & Data",  q:"What is the decimal value of the hexadecimal number 1F?",                       o:["15","30","31","16"],                                                                                                                                              a:2},
-  {t:"Networks",       q:"What does 'IP' stand for in networking?",                                       o:["Information Protocol","Internet Provider","Internet Protocol","Internal Program"],                                                                               a:2},
-  {t:"Networks",       q:"Which network topology connects every device to a central hub or switch?",       o:["Ring","Bus","Star","Mesh"],                                                                                                                                       a:2},
-  {t:"Networks",       q:"What is the role of a router in a network?",                                    o:["Connect devices using Wi-Fi only","Store web pages","Direct data packets between different networks","Increase processing speed"],                                a:2},
-  {t:"Networks",       q:"What does HTTP stand for?",                                                     o:["HyperText Transfer Protocol","High Transfer Text Program","HyperText Transmission Process","Hosted Text Transfer Program"],                                      a:0},
-  {t:"Networks",       q:"Which TCP/IP layer is responsible for reliable data delivery?",                  o:["Network","Application","Transport","Link"],                                                                                                                       a:2},
-  {t:"Algorithms",     q:"What is the purpose of a sorting algorithm?",                                   o:["To find a specific item in a list","To arrange items in a particular order","To remove duplicates","To count items"],                                             a:1},
-  {t:"Algorithms",     q:"Worst-case comparisons in linear search of n items?",                           o:["1","log n","n","n²"],                                                                                                                                             a:2},
-  {t:"Algorithms",     q:"Which sort repeatedly swaps adjacent out-of-order elements?",                   o:["Merge sort","Quick sort","Bubble sort","Insertion sort"],                                                                                                         a:2},
-  {t:"Algorithms",     q:"What does an algorithm's time complexity measure?",                              o:["Memory used","Time to type the code","How running time grows with input size","Number of errors"],                                                               a:2},
-  {t:"Algorithms",     q:"What is a flowchart used for in computing?",                                    o:["Displaying data in a table","Representing an algorithm visually","Designing a database","Writing HTML"],                                                          a:1},
-  {t:"Programming",    q:"What is a variable in programming?",                                            o:["A fixed value that cannot change","A named storage location that holds a value","A type of loop","A programming error"],                                         a:1},
-  {t:"Programming",    q:"Which is an example of a selection statement?",                                 o:["for loop","while loop","if...else","print()"],                                                                                                                    a:2},
-  {t:"Programming",    q:"What is the purpose of a function (subroutine)?",                               o:["To repeat code indefinitely","To reuse a block of code","To declare a variable","To handle errors"],                                                             a:1},
-  {t:"Programming",    q:"Which data type stores True or False?",                                         o:["Integer","String","Float","Boolean"],                                                                                                                             a:3},
-  {t:"Programming",    q:"What does 'iteration' mean in programming?",                                    o:["Declaring variables","Repeating a block of code","Defining a function","Handling exceptions"],                                                                    a:1},
-  {t:"Cyber Security", q:"What is phishing?",                                                             o:["A type of programming language","Hacking via physical access","A fraudulent attempt to obtain sensitive information by disguising as trustworthy","A network topology"], a:2},
-  {t:"Cyber Security", q:"What does 'malware' refer to?",                                                 o:["Poor-performing hardware","Software designed to disrupt, damage, or gain unauthorised access","A secure network connection","An OS feature"],                    a:1},
-  {t:"Cyber Security", q:"Which is an example of a strong password?",                                    o:["password123","myname","Tr#8xK!2mZ","abc"],                                                                                                                       a:2},
-  {t:"Cyber Security", q:"What is two-factor authentication (2FA)?",                                     o:["Using two passwords","Logging in twice","A security process requiring two verification methods","Encrypting data twice"],                                         a:2},
-  {t:"Cyber Security", q:"What is the purpose of a firewall?",                                           o:["Increase internet speed","Protect a network by filtering incoming and outgoing traffic","Store data securely","Manage user accounts"],                            a:1},
-  {t:"Hardware",       q:"What is the function of the CPU?",                                              o:["Store data permanently","Display images on the monitor","Process instructions and perform calculations","Provide an internet connection"],                        a:2},
-  {t:"Hardware",       q:"What type of storage is RAM?",                                                  o:["Permanent and non-volatile","Temporary and volatile","Optical storage","Magnetic storage"],                                                                       a:1},
-  {t:"Hardware",       q:"Which is an example of an output device?",                                     o:["Keyboard","Monitor","Microphone","Mouse"],                                                                                                                         a:1},
-  {t:"Hardware",       q:"What does 'open source' software mean?",                                       o:["Software that is expensive","Software whose source code is freely available to use and modify","Software that only works online","Software by one company"],       a:1},
-  {t:"Hardware",       q:"What is the main role of an operating system?",                                 o:["Browse the internet","Manage hardware resources and provide services to applications","Edit video files","Design websites"],                                       a:1},
-  {t:"Databases",      q:"In a relational database, what is a primary key?",                              o:["A database password","A field that uniquely identifies each record in a table","The first column","A key used to encrypt data"],                                  a:1},
-  {t:"Databases",      q:"What does SQL stand for?",                                                     o:["Structured Query Language","System Query Logic","Standard Question Language","Structured Question Logic"],                                                         a:0},
-  {t:"Databases",      q:"Which SQL command retrieves data from a database?",                             o:["INSERT","UPDATE","SELECT","DELETE"],                                                                                                                              a:2},
-  {t:"Ethics",         q:"What does the UK's Data Protection Act require organisations to do?",           o:["Share all user data freely","Store data indefinitely","Handle personal data responsibly and securely","Sell data to third parties"],                             a:2},
-  {t:"Ethics",         q:"What is 'digital inclusion'?",                                                  o:["Technology only for those who can afford it","Ensuring all people have equal access to and skills for digital technology","Restricting internet in schools","Only allowing certain websites"], a:1},
+  {t:"Binary & Data",  q:"What is the binary representation of the decimal number 25?",  o:["10011","11001","11010","10110"], a:1},
+  {t:"Binary & Data",  q:"How many bytes are in 1 kilobyte (using binary units)?",        o:["100","512","1000","1024"], a:3},
+  {t:"Binary & Data",  q:"What does ASCII stand for?",                                    o:["American Standard Code for Information Interchange","Automated System for Computing","Advanced Standard Computer Interface","American Symbolic Code for Integrated Information"], a:0},
+  {t:"Binary & Data",  q:"Which number system uses base 16?",                             o:["Binary","Octal","Hexadecimal","Denary"], a:2},
+  {t:"Binary & Data",  q:"What is the decimal value of the hexadecimal number 1F?",       o:["15","30","31","16"], a:2},
+  {t:"Binary & Data",  q:"How many bits are in a byte?",                                  o:["4","8","16","32"], a:1},
+  {t:"Binary & Data",  q:"What is the binary value of the decimal number 10?",            o:["1000","1010","1100","0110"], a:1},
+  {t:"Networks",       q:"What does IP stand for in networking?",                          o:["Information Protocol","Internet Provider","Internet Protocol","Internal Program"], a:2},
+  {t:"Networks",       q:"Which network topology connects every device to a central hub?", o:["Ring","Bus","Star","Mesh"], a:2},
+  {t:"Networks",       q:"What is the role of a router in a network?",                    o:["Connect devices using Wi-Fi only","Store web pages","Direct data packets between networks","Increase processing speed"], a:2},
+  {t:"Networks",       q:"What does HTTP stand for?",                                     o:["HyperText Transfer Protocol","High Transfer Text Program","HyperText Transmission Process","Hosted Text Transfer Program"], a:0},
+  {t:"Networks",       q:"Which TCP/IP layer is responsible for reliable data delivery?",  o:["Network","Application","Transport","Link"], a:2},
+  {t:"Networks",       q:"What does bandwidth refer to in networking?",                   o:["The physical length of a cable","The amount of data transmitted per second","The number of devices on a network","The speed of the processor"], a:1},
+  {t:"Networks",       q:"Which device connects a home network to the internet?",         o:["Switch","Hub","Router","Repeater"], a:2},
+  {t:"Algorithms",     q:"What is the purpose of a sorting algorithm?",                   o:["To find a specific item in a list","To arrange items in a particular order","To remove duplicates","To count items"], a:1},
+  {t:"Algorithms",     q:"Worst-case comparisons in a linear search of n items?",         o:["1","log n","n","n squared"], a:2},
+  {t:"Algorithms",     q:"Which sort repeatedly swaps adjacent out-of-order elements?",   o:["Merge sort","Quick sort","Bubble sort","Insertion sort"], a:2},
+  {t:"Algorithms",     q:"What does an algorithms time complexity measure?",              o:["Memory used","Time to type the code","How running time grows with input size","Number of errors"], a:2},
+  {t:"Algorithms",     q:"What is a flowchart used for in computing?",                    o:["Displaying data in a table","Representing an algorithm visually","Designing a database","Writing HTML"], a:1},
+  {t:"Algorithms",     q:"What is the key advantage of binary search over linear search?",o:["It works on unsorted lists","It is always faster on all lists","It halves the search space each step","It uses less memory"], a:2},
+  {t:"Algorithms",     q:"Which term means a step-by-step set of instructions for solving a problem?", o:["Variable","Algorithm","Function","Loop"], a:1},
+  {t:"Programming",    q:"What is a variable in programming?",                            o:["A fixed value that cannot change","A named storage location that holds a value","A type of loop","A programming error"], a:1},
+  {t:"Programming",    q:"Which is an example of a selection statement?",                 o:["for loop","while loop","if...else","print()"], a:2},
+  {t:"Programming",    q:"What is the purpose of a function or subroutine?",              o:["To repeat code indefinitely","To reuse a block of code","To declare a variable","To handle errors"], a:1},
+  {t:"Programming",    q:"Which data type stores True or False?",                         o:["Integer","String","Float","Boolean"], a:3},
+  {t:"Programming",    q:"What does iteration mean in programming?",                      o:["Declaring variables","Repeating a block of code","Defining a function","Handling exceptions"], a:1},
+  {t:"Programming",    q:"What symbol is used for string concatenation in Python?",       o:["-","*","+","/"], a:2},
+  {t:"Programming",    q:"What will a while loop do if its condition is always True?",    o:["Run once then stop","Skip the body","Run forever (infinite loop)","Throw an error immediately"], a:2},
+  {t:"Cyber Security", q:"What is phishing?",                                             o:["A type of programming language","Hacking via physical access","A fraudulent attempt to obtain sensitive information by disguising as trustworthy","A network topology"], a:2},
+  {t:"Cyber Security", q:"What does malware refer to?",                                  o:["Poor-performing hardware","Software designed to disrupt or gain unauthorised access","A secure network connection","An OS feature"], a:1},
+  {t:"Cyber Security", q:"Which is an example of a strong password?",                    o:["password123","myname","Tr#8xK!2mZ","abc"], a:2},
+  {t:"Cyber Security", q:"What is two-factor authentication?",                           o:["Using two passwords","Logging in twice","A security process requiring two verification methods","Encrypting data twice"], a:2},
+  {t:"Cyber Security", q:"What is the purpose of a firewall?",                           o:["Increase internet speed","Protect a network by filtering incoming and outgoing traffic","Store data securely","Manage user accounts"], a:1},
+  {t:"Cyber Security", q:"What type of malware locks your files and demands payment?",    o:["Spyware","Adware","Ransomware","Worm"], a:2},
+  {t:"Cyber Security", q:"What does HTTPS indicate about a website?",                    o:["It is hosted in the UK","The connection is encrypted and more secure","It loads faster","It is government approved"], a:1},
+  {t:"Hardware",       q:"What is the function of the CPU?",                              o:["Store data permanently","Display images on the monitor","Process instructions and perform calculations","Provide an internet connection"], a:2},
+  {t:"Hardware",       q:"What type of storage is RAM?",                                  o:["Permanent and non-volatile","Temporary and volatile","Optical storage","Magnetic storage"], a:1},
+  {t:"Hardware",       q:"Which is an example of an output device?",                     o:["Keyboard","Monitor","Microphone","Mouse"], a:1},
+  {t:"Hardware",       q:"What does open source software mean?",                         o:["Software that is expensive","Software whose source code is freely available to use and modify","Software that only works online","Software by one company"], a:1},
+  {t:"Hardware",       q:"What is the main role of an operating system?",                 o:["Browse the internet","Manage hardware resources and provide services to applications","Edit video files","Design websites"], a:1},
+  {t:"Ethics",         q:"What does the UK Data Protection Act require organisations to do?", o:["Share all user data freely","Store data indefinitely","Handle personal data responsibly and securely","Sell data to third parties"], a:2},
+  {t:"Ethics",         q:"What is digital inclusion?",                                   o:["Technology only for those who can afford it","Ensuring all people have equal access to digital technology","Restricting internet in schools","Only allowing certain websites"], a:1},
+  {t:"Ethics",         q:"What is copyright law designed to protect?",                    o:["Physical property","The creator's right to control how their work is used","Network security","Personal data only"], a:1},
 ];
 
 // ===== CONFIG =====
-const TEACHER_PIN     = '1984';
-const TOTAL_Q         = 35;
-const CORRECT_XP      = 10;
-const STREAK_BONUS    = 5;
-const TIME_BONUS      = 5;
-const VALID_DOMAIN    = 'corbybusinessacademy.org';
+const TEACHER_PIN  = '1984';
+const TOTAL_Q      = 35;
+const CORRECT_XP   = 10;
+const STREAK_BONUS = 5;
+const TIME_BONUS   = 5;
+const VALID_DOMAIN = 'corbybusinessacademy.org';
+const MS_PER_DAY   = 24 * 60 * 60 * 1000;
 
 // ===== STATE =====
 let student   = {};
@@ -939,21 +948,50 @@ let superPower = false;
 
 try { results = JSON.parse(localStorage.getItem('csq_results') || '[]'); } catch(e) { results = []; }
 
+// ===== ATTEMPT TRACKING =====
+function getAttemptRecord(email) {
+  try { const r = localStorage.getItem('csq_att_' + email); return r ? JSON.parse(r) : {attempts:[]}; }
+  catch(e) { return {attempts:[]}; }
+}
+function saveAttemptRecord(email, rec) {
+  try { localStorage.setItem('csq_att_' + email, JSON.stringify(rec)); } catch(e) {}
+}
+function checkAttemptAllowed(email) {
+  const rec = getAttemptRecord(email);
+  const now = Date.now();
+  if (rec.attempts.length === 0) return { allowed:true, attemptNum:1 };
+  if (rec.attempts.length === 1) {
+    const elapsed = now - rec.attempts[0].ts;
+    if (elapsed < MS_PER_DAY) {
+      const h = Math.ceil((MS_PER_DAY - elapsed) / 3600000);
+      return { allowed:false, attemptNum:2,
+        msg:'&#x23F3; Your second attempt (with a different set of questions) unlocks in <strong>' + h + ' hour' + (h!==1?'s':'') + '</strong>. Come back tomorrow!' };
+    }
+    return { allowed:true, attemptNum:2 };
+  }
+  return { allowed:false, attemptNum:0,
+    msg:'&#x1F512; You have completed both allowed attempts. Please speak to your teacher if you have any concerns.' };
+}
+function recordAttempt(email, attemptNum) {
+  const rec = getAttemptRecord(email);
+  rec.attempts.push({ ts: Date.now(), attemptNum });
+  saveAttemptRecord(email, rec);
+}
+
 // ===== THEME TOGGLES =====
 function toggleDark() {
   darkMode = !darkMode;
   document.body.classList.toggle('dark-mode', darkMode);
   const btn = document.getElementById('darkBtn');
   btn.classList.toggle('active', darkMode);
-  btn.textContent = darkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+  btn.textContent = darkMode ? 'Light Mode' : 'Dark Mode';
 }
-
 function toggleSuperpower() {
   superPower = !superPower;
   document.body.classList.toggle('super-power', superPower);
   const btn = document.getElementById('spBtn');
   btn.classList.toggle('active', superPower);
-  btn.textContent = superPower ? '⚡ Superpower ON' : '⚡ Superpower Mode';
+  btn.textContent = superPower ? 'Superpower ON' : 'Superpower Mode';
   document.getElementById('spInfoBox').style.display = superPower ? 'flex' : 'none';
 }
 
@@ -967,21 +1005,28 @@ function startQuiz() {
 
   if (!fn || !ln || !cls || !em.endsWith('@' + VALID_DOMAIN)) {
     err.classList.add('show');
+    err.innerHTML = 'Please complete all fields. Email must end in @corbybusinessacademy.org';
+    return;
+  }
+  const check = checkAttemptAllowed(em);
+  if (!check.allowed) {
+    err.classList.add('show');
+    err.innerHTML = check.msg;
     return;
   }
   err.classList.remove('show');
-
-  student  = { firstName: fn, lastName: ln, class: cls, email: em };
+  student = { firstName:fn, lastName:ln, class:cls, email:em, attemptNum:check.attemptNum };
   currentQ = 0; score = 0; xp = 0; streak = 0; answered = false;
 
-  // Shuffle full question bank then take first 35
+  // Attempt 2 reverses pool before shuffle so question mix differs
   questions = [...QUESTIONS];
-  for (let i = questions.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [questions[i], questions[j]] = [questions[j], questions[i]];
+  if (check.attemptNum === 2) questions.reverse();
+  for (let i = questions.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [questions[i],questions[j]] = [questions[j],questions[i]];
   }
   questions = questions.slice(0, TOTAL_Q);
-
+  recordAttempt(em, check.attemptNum);
   showScreen('quiz');
   loadQuestion();
 }
