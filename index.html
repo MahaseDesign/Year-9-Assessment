@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS Quest — Year 9 Assessment</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Nunito:wght@400;600;700;800&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.cdnfonts.com/css/open-dyslexic');
+
+:root {
+  --bg: #f0f4f8;
+  --bg2: #e2eaf3;
+  --panel: #ffffff;
+  --panel2: #f7f9fc;
+  --border: #c8d8ea;
+  --accent: #1a6fd4;
+  --accent2: #6c2bd9;
+  --accent3: #e53e6d;
+  --gold: #c8940a;
+  --green: #1a9e5c;
+  --text: #1a2a3a;
+  --text-dim: #6a88a0;
+  --shadow: 0 2px 14px rgba(0,0,0,0.08);
+  --glow: 0 0 16px rgba(26,111,212,0.25);
+}
+
+body.dark-mode {
+  --bg: #060b14;
+  --bg2: #0a1220;
+  --panel: #0c1422;
+  --panel2: #101c2e;
+  --border: #1a3a5c;
+  --accent: #00d4ff;
+  --accent2: #7b2fff;
+  --accent3: #ff3e6c;
+  --gold: #ffd700;
+  --green: #00ff9d;
+  --text: #c8e0f4;
+  --text-dim: #5a7a9a;
+  --shadow: 0 2px 20px rgba(0,0,0,0.4);
+}
+
+body.super-power {
+  --bg: #fdf8ee !important;
+  --bg2: #f7f0da !important;
+  --panel: #fffdf5 !important;
+  --panel2: #fef9ec !important;
+  --border: #d8c89a !important;
+  --text: #2c1a00 !important;
+  --text-dim: #7a6040 !important;
+}
+
+body.super-power,
+body.super-power * {
+  font-family: 'Open Dyslexic', Arial, sans-serif !important;
+  line-height: 1.95 !important;
+  letter-spacing: 0.06em !important;
+  word-spacing: 0.22em !important;
+}
+
+body.super-power .question-text { font-size: 1.2rem !important; }
+body.super-power .option { padding: 20px 24px !important; font-size: 1.05rem !important; }
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.4s, color 0.4s;
+}
+
+body.dark-mode::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+.container {
+  position:relative;
+  z-index:1;
+  max-width:920px;
+  margin:0 auto;
+  padding:16px 20px 40px;
+}
+
+/* TOOLBAR */
+.toolbar {
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-bottom:10px;
+  flex-wrap:wrap;
+}
+
+.tool-btn {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family:'Nunito',sans-serif;
+  font-size:0.8rem;
+  font-weight:800;
+  padding:8px 16px;
+  border-radius:20px;
+  border:2px solid var(--border);
+  background:var(--panel);
+  color:var(--text-dim);
+  cursor:pointer;
+  transition:all 0.3s;
+  box-shadow:var(--shadow);
+}
+.tool-btn:hover { border-color:var(--accent); color:var(--accent); }
+.tool-btn.active { background:var(--accent2); border-color:var(--accent2); color:white; }
+.tool-btn.sp-btn { border-color:#c8940a; color:#6b4a00; }
+.tool-btn.sp-btn:hover { background:#fff8e0; }
+.tool-btn.sp-btn.active { background:linear-gradient(135deg,#f5a623,#c8940a); border-color:#c8940a; color:white; }
+
+/* HEADER */
+.header {
+  text-align:center;
+  padding:22px 0 18px;
+  border-bottom:2px solid var(--border);
+  margin-bottom:26px;
+  position:relative;
+}
+
+.logo {
+  font-family:'Orbitron',monospace;
+  font-size:clamp(1.8rem,5vw,2.8rem);
+  font-weight:900;
+  letter-spacing:0.1em;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  filter:drop-shadow(0 2px 6px rgba(26,111,212,0.3));
+}
+
+.subtitle {
+  font-size:0.82rem;
+  color:var(--text-dim);
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  margin-top:5px;
+  font-family:'Share Tech Mono',monospace;
+}
+
+/* SCREENS */
+.screen { display:none; animation:fadeIn 0.4s ease; }
+.screen.active { display:block; }
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* PANEL */
+.panel {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:30px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.panel::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:16px 16px 0 0;
+}
+
+.panel-title {
+  font-family:'Orbitron',monospace;
+  font-size:0.95rem;
+  color:var(--accent);
+  letter-spacing:0.12em;
+  margin-bottom:20px;
+  text-transform:uppercase;
+}
+
+/* FORM */
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-group { display:flex; flex-direction:column; gap:7px; }
+.form-group.full { grid-column:1/-1; }
+
+label {
+  font-size:0.72rem;
+  letter-spacing:0.14em;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  font-weight:800;
+}
+
+input, select {
+  background:var(--bg);
+  border:2px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-family:'Nunito',sans-serif;
+  font-size:1rem;
+  font-weight:600;
+  padding:11px 15px;
+  transition:all 0.3s;
+  outline:none;
+  width:100%;
+}
+input:focus, select:focus {
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(26,111,212,0.15);
+}
+input::placeholder { color:var(--text-dim); font-weight:400; }
+select option { background:var(--panel); }
+
+.email-hint { font-size:0.7rem; color:var(--text-dim); font-style:italic; }
+
+/* BUTTONS */
+.btn-primary {
+  font-family:'Orbitron',monospace;
+  font-size:0.9rem;
+  font-weight:700;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;
+  box-shadow:var(--glow);
+  width:100%;
+  margin-top:14px;
+  padding:15px;
+  transition:all 0.3s;
+}
+.btn-primary:hover { transform:translateY(-2px); filter:brightness(1.08); }
+
+.btn-secondary {
+  font-family:'Orbitron',monospace;
+  font-size:0.72rem;
+  font-weight:700;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  border:2px solid var(--accent);
+  border-radius:8px;
+  cursor:pointer;
+  background:transparent;
+  color:var(--accent);
+  padding:10px 20px;
+  transition:all 0.3s;
+}
+.btn-secondary:hover { background:var(--accent); color:white; }
+
+.btn-teacher {
+  font-family:'Orbitron',monospace;
+  font-size:0.72rem;
+  font-weight:700;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  border:2px solid var(--accent2);
+  border-radius:8px;
+  cursor:pointer;
+  background:transparent;
+  color:var(--accent2);
+  padding:10px 20px;
+  transition:all 0.3s;
+}
+.btn-teacher:hover { background:var(--accent2); color:white; }
+
+/* HUD */
+.hud {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.hud-stat {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 16px;
+  text-align:center;
+  min-width:86px;
+  box-shadow:var(--shadow);
+}
+.hud-label { font-size:0.6rem; letter-spacing:0.18em; color:var(--text-dim); text-transform:uppercase; font-weight:800; }
+.hud-value { font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:var(--accent); }
+
+.progress-bar-wrap { flex:1; min-width:170px; }
+.progress-label { font-size:0.66rem; color:var(--text-dim); font-weight:700; margin-bottom:5px; letter-spacing:0.08em; text-transform:uppercase; }
+.progress-track { background:var(--bg2); border:1px solid var(--border); border-radius:99px; height:10px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width 0.5s cubic-bezier(.4,0,.2,1); }
+
+.timer { font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:700; color:var(--green); transition:color 0.3s; }
+.timer.warning { color:var(--gold); }
+.timer.danger { color:var(--accent3); animation:blink 0.5s infinite alternate; }
+@keyframes blink { from{opacity:1} to{opacity:0.3} }
+
+/* XP bar */
+.xp-section {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 16px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.xp-label { font-size:0.62rem; letter-spacing:0.18em; color:var(--text-dim); font-weight:800; text-transform:uppercase; white-space:nowrap; }
+.xp-bar-track { flex:1; background:var(--bg2); border-radius:99px; height:8px; overflow:hidden; border:1px solid var(--border); }
+.xp-bar-fill { height:100%; background:linear-gradient(90deg,var(--gold),#e8820a); border-radius:99px; transition:width 0.6s cubic-bezier(.4,0,.2,1); }
+.xp-count { font-family:'Orbitron',monospace; font-size:0.82rem; color:var(--gold); white-space:nowrap; font-weight:700; }
+.streak { font-family:'Orbitron',monospace; font-size:0.78rem; color:var(--gold); display:flex; align-items:center; gap:4px; font-weight:700; }
+
+/* QUESTION */
+.question-card {
+  background:var(--panel2);
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding:26px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.question-tag { font-size:0.68rem; font-weight:800; color:var(--accent2); letter-spacing:0.2em; margin-bottom:9px; text-transform:uppercase; }
+.question-text { font-size:1.08rem; font-weight:700; line-height:1.65; color:var(--text); }
+
+/* OPTIONS */
+.options { display:grid; gap:10px; }
+
+.option {
+  background:var(--panel);
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:14px 20px;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  font-size:1rem;
+  font-weight:600;
+  color:var(--text);
+  text-align:left;
+  width:100%;
+  box-shadow:var(--shadow);
+}
+.option:hover { border-color:var(--accent); background:var(--bg2); transform:translateX(4px); }
+.option.selected { border-color:var(--accent2); background:rgba(108,43,217,0.07); }
+.option.correct  { border-color:var(--green);  background:rgba(26,158,92,0.08); }
+.option.wrong    { border-color:var(--accent3); background:rgba(229,62,109,0.07); }
+.option.disabled { cursor:default; pointer-events:none; }
+
+.option-letter {
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;
+  font-weight:900;
+  color:var(--text-dim);
+  background:var(--bg2);
+  border:2px solid var(--border);
+  border-radius:6px;
+  width:32px; height:32px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition:all 0.2s;
+}
+.option.selected .option-letter { background:var(--accent2); color:#fff; border-color:var(--accent2); }
+.option.correct  .option-letter { background:var(--green);   color:#fff; border-color:var(--green); }
+.option.wrong    .option-letter { background:var(--accent3); color:#fff; border-color:var(--accent3); }
+
+.nav-row { display:flex; justify-content:flex-end; margin-top:16px; }
+
+.btn-next {
+  font-family:'Orbitron',monospace;
+  font-size:0.82rem;
+  font-weight:700;
+  letter-spacing:0.1em;
+  padding:13px 32px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;
+  transition:all 0.3s;
+  box-shadow:var(--glow);
+}
+.btn-next:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.08); }
+.btn-next:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+
+/* RESULTS */
+.results-hero { text-align:center; padding:30px 20px 18px; }
+
+.results-score-circle {
+  width:150px; height:150px;
+  border-radius:50%;
+  border:4px solid var(--accent);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  margin:0 auto 18px;
+  background:radial-gradient(circle,rgba(26,111,212,0.07),transparent);
+  box-shadow:0 0 28px rgba(26,111,212,0.2);
+}
+.results-score-num {
+  font-family:'Orbitron',monospace;
+  font-size:2.5rem;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1;
+}
+.results-score-denom { font-size:0.82rem; color:var(--text-dim); font-weight:600; font-family:'Share Tech Mono',monospace; }
+
+.grade-badge {
+  display:inline-block;
+  font-family:'Orbitron',monospace;
+  font-size:1.25rem;
+  font-weight:900;
+  padding:7px 26px;
+  border-radius:10px;
+  margin-bottom:10px;
+  letter-spacing:0.08em;
+}
+.grade-A { background:linear-gradient(135deg,#1a9e5c,#0d7a44); color:white; }
+.grade-B { background:linear-gradient(135deg,#1a6fd4,#1254a8); color:white; }
+.grade-C { background:linear-gradient(135deg,#c8940a,#9a6e00); color:white; }
+.grade-D { background:linear-gradient(135deg,#e07020,#b05510); color:white; }
+.grade-F { background:linear-gradient(135deg,#e53e6d,#b02848); color:white; }
+
+.stars { color:var(--gold); font-size:1.4rem; letter-spacing:4px; margin:5px 0 12px; }
+.results-meta { color:var(--text-dim); font-size:0.88rem; font-weight:700; margin-bottom:22px; }
+
+.results-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+.stat-box { background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; box-shadow:var(--shadow); }
+.stat-box-num { font-family:'Orbitron',monospace; font-size:1.6rem; font-weight:700; margin-bottom:4px; }
+.stat-box-label { font-size:0.68rem; letter-spacing:0.14em; color:var(--text-dim); text-transform:uppercase; font-weight:800; }
+.color-green { color:var(--green); }
+.color-red   { color:var(--accent3); }
+.color-gold  { color:var(--gold); }
+
+.completion-msg {
+  background:var(--panel2);
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:18px;
+  text-align:center;
+  font-size:0.95rem;
+  font-weight:600;
+  color:var(--text-dim);
+  line-height:1.7;
+}
+
+/* TEACHER PIN MODAL */
+.modal-overlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:500;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
+
+.modal-box {
+  background:var(--panel);
+  border:2px solid var(--border);
+  border-radius:16px;
+  padding:34px;
+  max-width:370px;
+  width:90%;
+  box-shadow:0 8px 40px rgba(0,0,0,0.2);
+  animation:fadeIn 0.3s ease;
+  text-align:center;
+}
+
+.modal-title { font-family:'Orbitron',monospace; font-size:0.95rem; color:var(--accent2); letter-spacing:0.12em; margin-bottom:6px; text-transform:uppercase; }
+.modal-sub { font-size:0.84rem; color:var(--text-dim); font-weight:600; margin-bottom:18px; }
+
+.pin-input {
+  font-family:'Orbitron',monospace;
+  font-size:1.7rem;
+  text-align:center;
+  letter-spacing:0.4em;
+  border:2px solid var(--border);
+  border-radius:10px;
+  padding:11px;
+  width:100%;
+  background:var(--bg);
+  color:var(--text);
+  margin-bottom:14px;
+  outline:none;
+}
+.pin-input:focus { border-color:var(--accent2); }
+
+.pin-error { color:var(--accent3); font-size:0.8rem; font-weight:700; display:none; margin-bottom:10px; }
+.pin-error.show { display:block; }
+
+.modal-btns { display:flex; gap:10px; }
+
+/* RESULTS TABLE */
+.results-page-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.filter-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.filter-row select, .filter-row input { width:auto; min-width:130px; font-size:0.84rem; padding:8px 12px; border-radius:8px; }
+
+.results-table { width:100%; border-collapse:collapse; font-size:0.86rem; }
+.results-table th {
+  font-size:0.6rem;
+  font-weight:800;
+  letter-spacing:0.16em;
+  color:var(--text-dim);
+  text-transform:uppercase;
+  padding:11px 14px;
+  text-align:left;
+  border-bottom:2px solid var(--border);
+}
+.results-table td {
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+  vertical-align:middle;
+  font-weight:600;
+}
+.results-table tr:hover td { background:var(--bg2); }
+
+.class-header td {
+  background:var(--panel2);
+  border-left:4px solid var(--accent2);
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.14em;
+  color:var(--accent2);
+  text-transform:uppercase;
+  padding:9px 14px;
+  border-bottom:1px solid var(--border);
+}
+
+.mini-badge {
+  font-family:'Orbitron',monospace;
+  font-size:0.6rem;
+  font-weight:900;
+  padding:3px 9px;
+  border-radius:5px;
+  display:inline-block;
+}
+
+.score-bar-wrap { display:flex; align-items:center; gap:8px; }
+.score-bar { height:6px; border-radius:99px; background:linear-gradient(90deg,var(--accent),var(--accent2)); flex-shrink:0; }
+.score-text { font-family:'Share Tech Mono',monospace; font-size:0.8rem; white-space:nowrap; }
+
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-dim); font-weight:700; font-size:0.9rem; }
+.empty-state .icon { font-size:3rem; margin-bottom:14px; opacity:0.4; display:block; }
+
+/* Score popup */
+.score-popup {
+  font-family:'Orbitron',monospace;
+  font-size:0.85rem;
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;
+  padding:11px 22px;
+  border-radius:10px;
+  font-weight:700;
+  pointer-events:none;
+  z-index:999;
+}
+.score-popup.show { animation:popUp 0.9s forwards; }
+@keyframes popUp {
+  0%  { transform:translate(-50%,-50%) scale(0); opacity:1; }
+  40% { transform:translate(-50%,-160%) scale(1.2); opacity:1; }
+  100%{ transform:translate(-50%,-270%) scale(0.7); opacity:0; }
+}
+
+.particle {
+  position:fixed;
+  width:7px;height:7px;
+  border-radius:50%;
+  pointer-events:none;
+  animation:burst 1s forwards;
+  z-index:998;
+}
+@keyframes burst {
+  0%  { transform:translate(0,0) scale(1);   opacity:1; }
+  100%{ transform:translate(var(--tx),var(--ty)) scale(0); opacity:0; }
+}
+
+/* Intro cards */
+.intro-features { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0; }
+.feature-card { background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; box-shadow:var(--shadow); }
+.feature-icon { font-size:1.7rem; margin-bottom:5px; }
+.feature-label { font-size:0.7rem; color:var(--text-dim); font-weight:800; letter-spacing:0.1em; text-transform:uppercase; }
+.feature-value { font-family:'Orbitron',monospace; font-size:1.05rem; color:var(--accent); font-weight:700; }
+
+.divider { border:none; border-top:1px solid var(--border); margin:20px 0; }
+.error-msg { color:var(--accent3); font-size:0.8rem; font-weight:700; margin-top:8px; display:none; }
+.error-msg.show { display:block; }
+
+.sp-info-box {
+  background:linear-gradient(135deg,#fff8e0,#fef3c0);
+  border:2px solid #c8940a;
+  border-radius:10px;
+  padding:12px 16px;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:0.86rem;
+  font-weight:700;
+  color:#6b4a00;
+}
+.dark-mode .sp-info-box { background:rgba(200,148,10,0.12); color:#c8940a; }
+
+.btn-export {
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;
+  font-weight:700;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  border:2px solid var(--green);
+  border-radius:8px;
+  cursor:pointer;
+  background:transparent;
+  color:var(--green);
+  padding:8px 14px;
+  transition:all 0.3s;
+  white-space:nowrap;
+}
+.btn-export:hover { background:var(--green); color:white; }
+
+@media (max-width:600px) {
+  .form-grid { grid-template-columns:1fr; }
+  .intro-features { grid-template-columns:1fr; }
+  .results-stats { grid-template-columns:1fr 1fr; }
+  .hud { flex-direction:column; align-items:stretch; }
+  .panel { padding:18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Teacher PIN Modal -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal-box">
+    <div class="modal-title">🔐 Teacher Access</div>
+    <div class="modal-sub">Enter your teacher PIN to view class results</div>
+    <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="••••">
+    <div class="pin-error" id="pinError">⚠ Incorrect PIN. Please try again.</div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closePinModal()" style="flex:1;padding:12px">Cancel</button>
+      <button class="btn-teacher" onclick="checkPin()" style="flex:1;padding:12px">Enter ▶</button>
+    </div>
+  </div>
+</div>
+
+<div class="score-popup" id="scorePopup">+10 XP</div>
+
+<div class="container">
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <button class="tool-btn sp-btn" id="spBtn" onclick="toggleSuperpower()">⚡ Superpower Mode</button>
+    <button class="tool-btn" id="darkBtn" onclick="toggleDark()">🌙 Dark Mode</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">CS QUEST</div>
+    <div class="subtitle">Corby Business Academy · Year 9 · Computer Science</div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="screen active" id="screen-register">
+    <div class="panel">
+      <div class="panel-title">⬡ Mission Briefing — Identify Yourself</div>
+
+      <div class="sp-info-box" id="spInfoBox" style="display:none">
+        ⚡ <span><strong>Superpower Mode is ON!</strong> Font, spacing and colours are optimised for easier reading.</span>
+      </div>
+
+      <div class="intro-features">
+        <div class="feature-card">
+          <div class="feature-icon">❓</div>
+          <div class="feature-value">35</div>
+          <div class="feature-label">Questions</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-value">XP</div>
+          <div class="feature-label">Points to Earn</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏆</div>
+          <div class="feature-value">Grade</div>
+          <div class="feature-label">Proof of Learning</div>
+        </div>
+      </div>
+      <hr class="divider">
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="firstName" placeholder="e.g. Ada" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="lastName" placeholder="e.g. Lovelace" autocomplete="family-name">
+        </div>
+        <div class="form-group">
+          <label>Class</label>
+          <select id="classSelect">
+            <option value="">— Select Class —</option>
+            <option>9X1</option><option>9X2</option><option>9X3</option><option>9X4</option>
+            <option>9Y1</option><option>9Y2</option><option>9Y3</option><option>9Y4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>School Email</label>
+          <input type="email" id="emailInput" placeholder="cba00student@corbybusinessacademy.org" autocomplete="email">
+          <div class="email-hint">Must end with @corbybusinessacademy.org</div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="reg-error">⚠ Please complete all fields. Email must end in @corbybusinessacademy.org</div>
+      <button class="btn-primary" onclick="startQuiz()">▶ Launch Assessment</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div class="xp-section">
+      <div class="xp-label">XP</div>
+      <div class="xp-bar-track"><div class="xp-bar-fill" id="xpBar" style="width:0%"></div></div>
+      <div class="xp-count" id="xpCount">0 XP</div>
+      <div class="streak" id="streakDisplay" style="display:none">🔥 <span id="streakNum">2</span></div>
+    </div>
+
+    <div class="hud">
+      <div class="hud-stat">
+        <div class="hud-label">Question</div>
+        <div class="hud-value" id="qNum">1/35</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-label" id="progressLabel">0% complete</div>
+        <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Score</div>
+        <div class="hud-value" id="scoreDisplay">0</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Time</div>
+        <div class="timer" id="timer">45</div>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-tag" id="questionTag">Topic</div>
+      <div class="question-text" id="questionText">Loading...</div>
+    </div>
+
+    <div class="options" id="optionsContainer"></div>
+
+    <div class="nav-row">
+      <button class="btn-next" id="nextBtn" onclick="nextQuestion()" disabled>NEXT ▶</button>
+    </div>
+  </div>
+
+  <!-- STUDENT RESULTS -->
+  <div class="screen" id="screen-results">
+    <div class="panel">
+      <div class="results-hero">
+        <div class="results-score-circle">
+          <div class="results-score-num" id="finalScore">0</div>
+          <div class="results-score-denom">/35</div>
+        </div>
+        <div class="grade-badge" id="gradeBadge">—</div>
+        <div class="stars" id="starRating">★★★☆☆</div>
+        <h2 style="font-family:'Orbitron',monospace;font-size:1.15rem;margin-bottom:5px" id="resultName"></h2>
+        <div class="results-meta" id="resultsMeta"></div>
+      </div>
+
+      <div class="results-stats">
+        <div class="stat-box">
+          <div class="stat-box-num color-green" id="correctCount">0</div>
+          <div class="stat-box-label">Correct</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num color-red" id="wrongCount">0</div>
+          <div class="stat-box-label">Incorrect</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num color-gold" id="totalXP">0</div>
+          <div class="stat-box-label">XP Earned</div>
+        </div>
+      </div>
+
+      <div class="completion-msg">
+        🎉 Great work! Your result has been recorded.<br>
+        <strong>Your teacher can view the full class results and feedback.</strong><br>
+        You may close this window or start a new attempt below.
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-teacher" onclick="openPinModal()" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
+          🔐 Teacher: View Results
+        </button>
+        <button class="btn-secondary" onclick="resetQuiz()" style="flex:1;padding:13px;border-radius:10px;font-family:'Orbitron',monospace;font-size:0.75rem;letter-spacing:0.08em;cursor:pointer">
+          ↺ New Attempt
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEACHER RESULTS -->
+  <div class="screen" id="screen-classresults">
+    <div class="results-page-header">
+      <div>
+        <div style="font-family:'Orbitron',monospace;font-size:0.95rem;color:var(--accent2);letter-spacing:0.12em">📋 Proof of Learning — Teacher View</div>
+        <div style="font-size:0.78rem;color:var(--text-dim);font-weight:700;margin-top:4px">Sorted by Class → Last Name (A–Z)</div>
+      </div>
+      <div class="filter-row">
+        <select id="filterClass" onchange="renderResultsTable()">
+          <option value="">All Classes</option>
+        </select>
+        <input type="text" id="filterName" placeholder="Search name..." oninput="renderResultsTable()">
+        <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
+        <button class="btn-secondary" onclick="clearResults()" style="border-color:var(--accent3);color:var(--accent3);padding:8px 12px;font-size:0.68rem">🗑 Clear</button>
+        <button class="btn-secondary" onclick="showScreen('results')" style="padding:8px 14px;font-size:0.68rem">← Back</button>
+      </div>
+    </div>
+
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Last Name</th><th>First Name</th><th>Class</th>
+            <th>Email</th><th>Score</th><th>Grade</th><th>XP</th><th>Completed</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <span class="icon">📭</span>
+        No results yet. Students must complete the assessment first.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ===== QUESTIONS =====
+const QUESTIONS = [
+  {t:"Binary & Data",  q:"What is the binary representation of the decimal number 25?",                   o:["10011","11001","11010","10110"],                                                                                                                                   a:1},
+  {t:"Binary & Data",  q:"How many bytes are in 1 kilobyte (using binary units)?",                        o:["100","512","1000","1024"],                                                                                                                                         a:3},
+  {t:"Binary & Data",  q:"What does ASCII stand for?",                                                    o:["American Standard Code for Information Interchange","Automated System for Computing Information Indexing","Advanced Standard Computer Interface Information","American Symbolic Code for Integrated Information"], a:0},
+  {t:"Binary & Data",  q:"Which number system uses base 16?",                                             o:["Binary","Octal","Hexadecimal","Denary"],                                                                                                                          a:2},
+  {t:"Binary & Data",  q:"What is the decimal value of the hexadecimal number 1F?",                       o:["15","30","31","16"],                                                                                                                                              a:2},
+  {t:"Networks",       q:"What does 'IP' stand for in networking?",                                       o:["Information Protocol","Internet Provider","Internet Protocol","Internal Program"],                                                                               a:2},
+  {t:"Networks",       q:"Which network topology connects every device to a central hub or switch?",       o:["Ring","Bus","Star","Mesh"],                                                                                                                                       a:2},
+  {t:"Networks",       q:"What is the role of a router in a network?",                                    o:["Connect devices using Wi-Fi only","Store web pages","Direct data packets between different networks","Increase processing speed"],                                a:2},
+  {t:"Networks",       q:"What does HTTP stand for?",                                                     o:["HyperText Transfer Protocol","High Transfer Text Program","HyperText Transmission Process","Hosted Text Transfer Program"],                                      a:0},
+  {t:"Networks",       q:"Which TCP/IP layer is responsible for reliable data delivery?",                  o:["Network","Application","Transport","Link"],                                                                                                                       a:2},
+  {t:"Algorithms",     q:"What is the purpose of a sorting algorithm?",                                   o:["To find a specific item in a list","To arrange items in a particular order","To remove duplicates","To count items"],                                             a:1},
+  {t:"Algorithms",     q:"Worst-case comparisons in linear search of n items?",                           o:["1","log n","n","n²"],                                                                                                                                             a:2},
+  {t:"Algorithms",     q:"Which sort repeatedly swaps adjacent out-of-order elements?",                   o:["Merge sort","Quick sort","Bubble sort","Insertion sort"],                                                                                                         a:2},
+  {t:"Algorithms",     q:"What does an algorithm's time complexity measure?",                              o:["Memory used","Time to type the code","How running time grows with input size","Number of errors"],                                                               a:2},
+  {t:"Algorithms",     q:"What is a flowchart used for in computing?",                                    o:["Displaying data in a table","Representing an algorithm visually","Designing a database","Writing HTML"],                                                          a:1},
+  {t:"Programming",    q:"What is a variable in programming?",                                            o:["A fixed value that cannot change","A named storage location that holds a value","A type of loop","A programming error"],                                         a:1},
+  {t:"Programming",    q:"Which is an example of a selection statement?",                                 o:["for loop","while loop","if...else","print()"],                                                                                                                    a:2},
+  {t:"Programming",    q:"What is the purpose of a function (subroutine)?",                               o:["To repeat code indefinitely","To reuse a block of code","To declare a variable","To handle errors"],                                                             a:1},
+  {t:"Programming",    q:"Which data type stores True or False?",                                         o:["Integer","String","Float","Boolean"],                                                                                                                             a:3},
+  {t:"Programming",    q:"What does 'iteration' mean in programming?",                                    o:["Declaring variables","Repeating a block of code","Defining a function","Handling exceptions"],                                                                    a:1},
+  {t:"Cyber Security", q:"What is phishing?",                                                             o:["A type of programming language","Hacking via physical access","A fraudulent attempt to obtain sensitive information by disguising as trustworthy","A network topology"], a:2},
+  {t:"Cyber Security", q:"What does 'malware' refer to?",                                                 o:["Poor-performing hardware","Software designed to disrupt, damage, or gain unauthorised access","A secure network connection","An OS feature"],                    a:1},
+  {t:"Cyber Security", q:"Which is an example of a strong password?",                                    o:["password123","myname","Tr#8xK!2mZ","abc"],                                                                                                                       a:2},
+  {t:"Cyber Security", q:"What is two-factor authentication (2FA)?",                                     o:["Using two passwords","Logging in twice","A security process requiring two verification methods","Encrypting data twice"],                                         a:2},
+  {t:"Cyber Security", q:"What is the purpose of a firewall?",                                           o:["Increase internet speed","Protect a network by filtering incoming and outgoing traffic","Store data securely","Manage user accounts"],                            a:1},
+  {t:"Hardware",       q:"What is the function of the CPU?",                                              o:["Store data permanently","Display images on the monitor","Process instructions and perform calculations","Provide an internet connection"],                        a:2},
+  {t:"Hardware",       q:"What type of storage is RAM?",                                                  o:["Permanent and non-volatile","Temporary and volatile","Optical storage","Magnetic storage"],                                                                       a:1},
+  {t:"Hardware",       q:"Which is an example of an output device?",                                     o:["Keyboard","Monitor","Microphone","Mouse"],                                                                                                                         a:1},
+  {t:"Hardware",       q:"What does 'open source' software mean?",                                       o:["Software that is expensive","Software whose source code is freely available to use and modify","Software that only works online","Software by one company"],       a:1},
+  {t:"Hardware",       q:"What is the main role of an operating system?",                                 o:["Browse the internet","Manage hardware resources and provide services to applications","Edit video files","Design websites"],                                       a:1},
+  {t:"Databases",      q:"In a relational database, what is a primary key?",                              o:["A database password","A field that uniquely identifies each record in a table","The first column","A key used to encrypt data"],                                  a:1},
+  {t:"Databases",      q:"What does SQL stand for?",                                                     o:["Structured Query Language","System Query Logic","Standard Question Language","Structured Question Logic"],                                                         a:0},
+  {t:"Databases",      q:"Which SQL command retrieves data from a database?",                             o:["INSERT","UPDATE","SELECT","DELETE"],                                                                                                                              a:2},
+  {t:"Ethics",         q:"What does the UK's Data Protection Act require organisations to do?",           o:["Share all user data freely","Store data indefinitely","Handle personal data responsibly and securely","Sell data to third parties"],                             a:2},
+  {t:"Ethics",         q:"What is 'digital inclusion'?",                                                  o:["Technology only for those who can afford it","Ensuring all people have equal access to and skills for digital technology","Restricting internet in schools","Only allowing certain websites"], a:1},
+];
+
+// ===== CONFIG =====
+const TEACHER_PIN     = '1984';
+const TOTAL_Q         = 35;
+const CORRECT_XP      = 10;
+const STREAK_BONUS    = 5;
+const TIME_BONUS      = 5;
+const VALID_DOMAIN    = 'corbybusinessacademy.org';
+
+// ===== STATE =====
+let student   = {};
+let questions = [];
+let currentQ  = 0;
+let score     = 0;
+let xp        = 0;
+let streak    = 0;
+let answered  = false;
+let timeLeft  = 45;
+let timerInterval = null;
+let results   = [];
+let darkMode  = false;
+let superPower = false;
+
+try { results = JSON.parse(localStorage.getItem('csq_results') || '[]'); } catch(e) { results = []; }
+
+// ===== THEME TOGGLES =====
+function toggleDark() {
+  darkMode = !darkMode;
+  document.body.classList.toggle('dark-mode', darkMode);
+  const btn = document.getElementById('darkBtn');
+  btn.classList.toggle('active', darkMode);
+  btn.textContent = darkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+
+function toggleSuperpower() {
+  superPower = !superPower;
+  document.body.classList.toggle('super-power', superPower);
+  const btn = document.getElementById('spBtn');
+  btn.classList.toggle('active', superPower);
+  btn.textContent = superPower ? '⚡ Superpower ON' : '⚡ Superpower Mode';
+  document.getElementById('spInfoBox').style.display = superPower ? 'flex' : 'none';
+}
+
+// ===== REGISTRATION =====
+function startQuiz() {
+  const fn  = document.getElementById('firstName').value.trim();
+  const ln  = document.getElementById('lastName').value.trim();
+  const cls = document.getElementById('classSelect').value;
+  const em  = document.getElementById('emailInput').value.trim().toLowerCase();
+  const err = document.getElementById('reg-error');
+
+  if (!fn || !ln || !cls || !em.endsWith('@' + VALID_DOMAIN)) {
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+
+  student  = { firstName: fn, lastName: ln, class: cls, email: em };
+  currentQ = 0; score = 0; xp = 0; streak = 0; answered = false;
+
+  // Shuffle full question bank then take first 35
+  questions = [...QUESTIONS];
+  for (let i = questions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [questions[i], questions[j]] = [questions[j], questions[i]];
+  }
+  questions = questions.slice(0, TOTAL_Q);
+
+  showScreen('quiz');
+  loadQuestion();
+}
+
+// ===== QUIZ =====
+function loadQuestion() {
+  answered = false;
+
+  const q = questions[currentQ];
+
+  document.getElementById('qNum').textContent    = `${currentQ + 1}/${TOTAL_Q}`;
+  document.getElementById('questionTag').textContent  = q.t;
+  document.getElementById('questionText').textContent = q.q;
+
+  const pct = Math.round((currentQ / TOTAL_Q) * 100);
+  document.getElementById('progressBar').style.width  = pct + '%';
+  document.getElementById('progressLabel').textContent = pct + '% complete';
+
+  // Build options
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  const letters = ['A','B','C','D'];
+
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${escHtml(opt)}</span>`;
+    btn.addEventListener('click', () => selectAnswer(i, btn));
+    container.appendChild(btn);
+  });
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = (currentQ === TOTAL_Q - 1) ? 'FINISH ✓' : 'NEXT ▶';
+
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 45;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerInterval); autoSkip(); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  el.textContent = timeLeft;
+  el.className   = 'timer';
+  if      (timeLeft <= 10) el.classList.add('danger');
+  else if (timeLeft <= 20) el.classList.add('warning');
+}
+
+function autoSkip() {
+  if (answered) return;
+  answered = true;
+  streak   = 0;
+  updateStreak();
+  const opts = document.querySelectorAll('.option');
+  opts[questions[currentQ].a].classList.add('correct');
+  opts.forEach(o => o.classList.add('disabled'));
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function selectAnswer(index, btn) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+
+  const q    = questions[currentQ];
+  const opts = document.querySelectorAll('.option');
+  opts.forEach(o => o.classList.add('disabled'));
+
+  if (index === q.a) {
+    btn.classList.add('correct');
+    score++;
+    streak++;
+    let gained = CORRECT_XP;
+    if (streak >= 3) gained += STREAK_BONUS;
+    if (timeLeft > 30) gained += TIME_BONUS;
+    xp += gained;
+    document.getElementById('scoreDisplay').textContent = score;
+    showScorePopup(`+${gained} XP`);
+    fireBurst();
+  } else {
+    btn.classList.add('wrong');
+    opts[q.a].classList.add('correct');
+    streak = 0;
+  }
+
+  updateXPBar();
+  updateStreak();
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function updateXPBar() {
+  const maxXP = TOTAL_Q * (CORRECT_XP + STREAK_BONUS + TIME_BONUS);
+  document.getElementById('xpBar').style.width  = Math.min(100, (xp / maxXP) * 100) + '%';
+  document.getElementById('xpCount').textContent = xp + ' XP';
+}
+
+function updateStreak() {
+  const el = document.getElementById('streakDisplay');
+  if (streak >= 2) {
+    el.style.display = 'flex';
+    document.getElementById('streakNum').textContent = streak;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= TOTAL_Q) { endQuiz(); return; }
+  loadQuestion();
+}
+
+// ===== END QUIZ =====
+function endQuiz() {
+  clearInterval(timerInterval);
+  const pct = Math.round((score / TOTAL_Q) * 100);
+  let grade, gradeClass, stars;
+  if      (pct >= 90) { grade='A*'; gradeClass='grade-A'; stars='★★★★★'; }
+  else if (pct >= 75) { grade='A';  gradeClass='grade-A'; stars='★★★★☆'; }
+  else if (pct >= 60) { grade='B';  gradeClass='grade-B'; stars='★★★☆☆'; }
+  else if (pct >= 45) { grade='C';  gradeClass='grade-C'; stars='★★☆☆☆'; }
+  else if (pct >= 30) { grade='D';  gradeClass='grade-D'; stars='★☆☆☆☆'; }
+  else                { grade='F';  gradeClass='grade-F'; stars='☆☆☆☆☆'; }
+
+  const result = { ...student, score, grade, xp, pct, timestamp: new Date().toLocaleString('en-GB') };
+  results = results.filter(r => !(r.email === student.email && r.class === student.class));
+  results.push(result);
+  try { localStorage.setItem('csq_results', JSON.stringify(results)); } catch(e) {}
+
+  document.getElementById('finalScore').textContent    = score;
+  document.getElementById('gradeBadge').textContent    = `${grade} (${pct}%)`;
+  document.getElementById('gradeBadge').className      = 'grade-badge ' + gradeClass;
+  document.getElementById('starRating').textContent    = stars;
+  document.getElementById('resultName').textContent    = `${student.firstName} ${student.lastName}`;
+  document.getElementById('resultsMeta').textContent   = `${student.class} · ${student.email}`;
+  document.getElementById('correctCount').textContent  = score;
+  document.getElementById('wrongCount').textContent    = TOTAL_Q - score;
+  document.getElementById('totalXP').textContent       = xp;
+
+  showScreen('results');
+}
+
+// ===== TEACHER PIN =====
+function openPinModal() {
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinError').classList.remove('show');
+  document.getElementById('pinModal').classList.add('open');
+  setTimeout(() => document.getElementById('pinInput').focus(), 100);
+}
+
+function closePinModal() {
+  document.getElementById('pinModal').classList.remove('open');
+}
+
+function checkPin() {
+  if (document.getElementById('pinInput').value === TEACHER_PIN) {
+    closePinModal();
+    populateClassFilter();
+    renderResultsTable();
+    showScreen('classresults');
+  } else {
+    document.getElementById('pinError').classList.add('show');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinInput').focus();
+  }
+}
+
+document.getElementById('pinInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPin();
+});
+
+// ===== RESULTS TABLE =====
+function populateClassFilter() {
+  const sel = document.getElementById('filterClass');
+  const classes = [...new Set(results.map(r => r.class))].sort();
+  sel.innerHTML = '<option value="">All Classes</option>';
+  classes.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    sel.appendChild(o);
+  });
+}
+
+function renderResultsTable() {
+  const cf = document.getElementById('filterClass').value;
+  const nf = document.getElementById('filterName').value.toLowerCase();
+
+  let filtered = results.filter(r => {
+    const mc = !cf || r.class === cf;
+    const mn = !nf || r.firstName.toLowerCase().includes(nf) || r.lastName.toLowerCase().includes(nf);
+    return mc && mn;
+  });
+
+  filtered.sort((a, b) => {
+    if (a.class !== b.class) return a.class.localeCompare(b.class);
+    return a.lastName.localeCompare(b.lastName);
+  });
+
+  const tbody = document.getElementById('resultsBody');
+  const empty = document.getElementById('emptyState');
+  const thead = document.querySelector('.results-table thead');
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    empty.style.display = 'block';
+    thead.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  thead.style.display = '';
+
+  const gradeMap = {'A*':'grade-A','A':'grade-A','B':'grade-B','C':'grade-C','D':'grade-D','F':'grade-F'};
+  let lastClass = null, rank = 0;
+
+  filtered.forEach(r => {
+    if (r.class !== lastClass) {
+      lastClass = r.class; rank = 0;
+      const cr = document.createElement('tr');
+      cr.className = 'class-header';
+      cr.innerHTML = `<td colspan="9">📁 CLASS ${escHtml(r.class)}</td>`;
+      tbody.appendChild(cr);
+    }
+    rank++;
+    const bw = Math.round(r.pct * 0.65);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--text-dim);font-family:'Share Tech Mono',monospace">${rank}</td>
+      <td style="font-weight:800">${escHtml(r.lastName)}</td>
+      <td>${escHtml(r.firstName)}</td>
+      <td style="font-family:'Orbitron',monospace;font-size:0.76rem;color:var(--accent2)">${escHtml(r.class)}</td>
+      <td style="font-family:'Share Tech Mono',monospace;font-size:0.76rem;color:var(--text-dim)">${escHtml(r.email)}</td>
+      <td><div class="score-bar-wrap">
+        <div class="score-bar" style="width:${bw}px"></div>
+        <span class="score-text">${r.score}/${TOTAL_Q} (${r.pct}%)</span>
+      </div></td>
+      <td><span class="mini-badge ${gradeMap[r.grade]||'grade-F'}">${escHtml(r.grade)}</span></td>
+      <td style="font-family:'Orbitron',monospace;font-size:0.76rem;color:var(--gold)">${r.xp}</td>
+      <td style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim)">${escHtml(r.timestamp)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function clearResults() {
+  if (!confirm('Clear ALL results? This cannot be undone.')) return;
+  results = [];
+  try { localStorage.removeItem('csq_results'); } catch(e) {}
+  renderResultsTable();
+}
+
+function exportCSV() {
+  const rows = [['Last Name','First Name','Class','Email','Score','Percent','Grade','XP','Completed']];
+  [...results].sort((a,b) => a.class !== b.class ? a.class.localeCompare(b.class) : a.lastName.localeCompare(b.lastName))
+    .forEach(r => rows.push([r.lastName,r.firstName,r.class,r.email,r.score,r.pct+'%',r.grade,r.xp,r.timestamp]));
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'cs_quest_results.csv';
+  a.click();
+}
+
+// ===== UTILS =====
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function resetQuiz() {
+  clearInterval(timerInterval);
+  showScreen('register');
+  ['firstName','lastName','emailInput'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('classSelect').value = '';
+  document.getElementById('scoreDisplay').textContent = '0';
+  document.getElementById('xpBar').style.width = '0%';
+  document.getElementById('xpCount').textContent = '0 XP';
+  document.getElementById('streakDisplay').style.display = 'none';
+}
+
+function showScorePopup(text) {
+  const el = document.getElementById('scorePopup');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 950);
+}
+
+function fireBurst() {
+  const cols = ['#1a6fd4','#6c2bd9','#1a9e5c','#c8940a'];
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (Math.PI * 2 / 14) * i;
+    const dist  = 70 + Math.random() * 80;
+    p.style.cssText = `left:50%;top:50%;background:${cols[i%cols.length]};--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1100);
+  }
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
